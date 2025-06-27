@@ -10,6 +10,7 @@ import { RepairsModule } from './repairs/repairs.module';
 import { TestimonialsModule } from './testimonials/testimonials.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { SeedModule } from './seed/seed.module';
+import { DateUserModule } from './date-user/date-user.module';
 
 @Module({
   imports: [
@@ -24,11 +25,12 @@ import { SeedModule } from './seed/seed.module';
       }),
       inject: [ConfigService],
     }),
-    ProductsModule,
-    CoursesModule,
-    RepairsModule,
-    TestimonialsModule,
-    ContactsModule,
+    // ProductsModule,
+    // CoursesModule,
+    // RepairsModule,
+    // TestimonialsModule,
+    // ContactsModule,
+    DateUserModule,
     SeedModule,
   ],
   controllers: [AppController],

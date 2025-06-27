@@ -5,6 +5,7 @@ import { CoursesModule } from '../courses/courses.module';
 import { RepairsModule } from '../repairs/repairs.module';
 import { TestimonialsModule } from '../testimonials/testimonials.module';
 import { ContactsModule } from '../contacts/contacts.module';
+import { DateUserModule } from '../date-user/date-user.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ContactsModule } from '../contacts/contacts.module';
     RepairsModule,
     TestimonialsModule,
     ContactsModule,
+    DateUserModule,
   ],
   providers: [SeedService],
   exports: [SeedService],

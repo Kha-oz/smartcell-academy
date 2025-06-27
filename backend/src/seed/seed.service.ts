@@ -4,12 +4,14 @@ import { CoursesService } from '../courses/courses.service';
 import { RepairsService } from '../repairs/repairs.service';
 import { TestimonialsService } from '../testimonials/testimonials.service';
 import { ContactsService } from '../contacts/contacts.service';
+import { DateUserService } from '../date-user/date-user.service';
 
 import { products } from '../../seeds/products.seed';
 import { courses } from '../../seeds/courses.seed';
 import { repairs } from '../../seeds/repairs.seed';
 import { testimonials } from '../../seeds/testimonials.seed';
 import { contacts } from '../../seeds/contacts.seed';
+import { dateUsersSeed } from '../../seeds/date-users.seed';
 
 @Injectable()
 export class SeedService implements OnModuleInit {
@@ -19,6 +21,7 @@ export class SeedService implements OnModuleInit {
     private readonly repairsService: RepairsService,
     private readonly testimonialsService: TestimonialsService,
     private readonly contactsService: ContactsService,
+    private readonly dateUserService: DateUserService,
   ) {}
 
   async onModuleInit() {
@@ -27,6 +30,7 @@ export class SeedService implements OnModuleInit {
     await this.seedRepairs();
     await this.seedTestimonials();
     await this.seedContacts();
+    await this.seedDateUsers();
     // Puedes agregar seed de usuario admin si lo necesitas
   }
 
@@ -88,5 +92,17 @@ export class SeedService implements OnModuleInit {
       await this.contactsService.create(contact);
     }
     console.log('✅ Contactos insertados correctamente');
+  }
+
+  private async seedDateUsers() {
+    const existing = await this.dateUserService.findAll();
+    if (existing.length > 0) {
+      console.log('ℹ️ DateUsers ya existen, saltando seed');
+      return;
+    }
+    for (const dateUser of dateUsersSeed) {
+      await this.dateUserService.create(dateUser);
+    }
+    console.log('✅ DateUsers insertados correctamente');
   }
 } 

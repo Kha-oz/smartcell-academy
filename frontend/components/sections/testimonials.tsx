@@ -1,14 +1,60 @@
+"use client"
+
+import { useTestimonials } from "@/hooks/admin/useTestimonials"
 import { Card, CardContent } from "@/components/ui/card"
-import { Star, Quote } from "lucide-react"
-import { useEffect, useState } from "react"
+import { Star, Quote, Loader2 } from "lucide-react"
 
 export default function Testimonials() {
-  const [testimonials, setTestimonials] = useState<any[]>([])
+  const { testimonials, loading, error } = useTestimonials()
 
-  useEffect(() => {
-    // Aquí deberías hacer fetch a la API real
-    setTestimonials([])
-  }, [])
+  if (loading) {
+    return (
+      <section id="testimonios" className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-black mb-4">Testimonios</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Lo que opinan nuestros estudiantes y clientes sobre SmartCell Academy.
+            </p>
+          </div>
+          <div className="flex justify-center items-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+            <span className="ml-2 text-gray-500">Cargando testimonios...</span>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (error) {
+    return (
+      <section id="testimonios" className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-black mb-4">Testimonios</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Lo que opinan nuestros estudiantes y clientes sobre SmartCell Academy.
+            </p>
+          </div>
+          <div className="text-center py-8">
+            <p className="text-red-500">Error al cargar testimonios: {error}</p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  // Filtrar solo testimonios visibles
+  const visibleTestimonials = testimonials.filter(testimonial => testimonial.is_visible)
+
+  // Función para renderizar estrellas de manera segura
+  const renderStars = (rating: number) => {
+    // Validar que rating sea un número válido entre 0 y 5
+    const validRating = Math.max(0, Math.min(5, Math.floor(rating || 0)))
+    return Array.from({ length: validRating }, (_, i) => (
+      <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+    ))
+  }
 
   return (
     <section id="testimonios" className="py-20 bg-gray-50">
@@ -20,18 +66,16 @@ export default function Testimonials() {
           </p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {testimonials.length === 0 ? (
+          {visibleTestimonials.length === 0 ? (
             <div className="col-span-3 text-center text-gray-400">Próximamente testimonios disponibles...</div>
           ) : (
-            testimonials.map((testimonial, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow border-2 hover:border-green-500">
+            visibleTestimonials.map((testimonial) => (
+              <Card key={testimonial._id} className="hover:shadow-lg transition-shadow border-2 hover:border-green-500">
                 <CardContent className="p-6">
                   <div className="flex items-center mb-4">
                     <Quote className="h-8 w-8 text-green-500 mr-3" />
                     <div className="flex">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
-                      ))}
+                      {renderStars(testimonial.rating)}
                     </div>
                   </div>
 
@@ -39,11 +83,13 @@ export default function Testimonials() {
 
                   <div className="flex items-center">
                     <div className="w-12 h-12 bg-gray-200 rounded-full mr-4 flex items-center justify-center">
-                      <span className="text-lg font-bold text-gray-600">{testimonial.name.charAt(0)}</span>
+                      <span className="text-lg font-bold text-gray-600">
+                        {(testimonial.name || 'A').charAt(0).toUpperCase()}
+                      </span>
                     </div>
                     <div>
-                      <div className="font-semibold text-black">{testimonial.name}</div>
-                      <div className="text-sm text-gray-500">{testimonial.role}</div>
+                      <div className="font-semibold text-black">{testimonial.name || 'Anónimo'}</div>
+                      <div className="text-sm text-gray-500">{testimonial.role || 'Cliente'}</div>
                     </div>
                   </div>
                 </CardContent>

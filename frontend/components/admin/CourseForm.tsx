@@ -3,54 +3,55 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Save, X, Loader2 } from "lucide-react"
-import { ProductFormData } from "@/hooks/admin/useProducts"
+import { CourseFormData } from "@/hooks/admin/useCourses"
 
-interface ProductFormProps {
-  formData: ProductFormData
-  setFormData: (data: ProductFormData) => void
+interface CourseFormProps {
+  formData: CourseFormData
+  setFormData: (data: CourseFormData) => void
   onSubmit: (e: React.FormEvent) => void
   onCancel: () => void
   isEditing: boolean
-  editingProduct: any
+  editingCourse: any
   loading?: boolean
 }
 
-export function ProductForm({
+export function CourseForm({
   formData,
   setFormData,
   onSubmit,
   onCancel,
   isEditing,
-  editingProduct,
+  editingCourse,
   loading = false
-}: ProductFormProps) {
+}: CourseFormProps) {
   if (!isEditing) return null
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{editingProduct ? "Editar Producto" : "Nuevo Producto"}</CardTitle>
+        <CardTitle>{editingCourse ? "Editar Curso" : "Nuevo Curso"}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="name">Nombre del Producto</Label>
+              <Label htmlFor="title">Título del Curso</Label>
               <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                id="title"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 required
                 disabled={loading}
               />
             </div>
             <div>
-              <Label htmlFor="category">Categoría</Label>
+              <Label htmlFor="instructor">Instructor</Label>
               <Input
-                id="category"
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                id="instructor"
+                value={formData.instructor}
+                onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
                 required
                 disabled={loading}
               />
@@ -71,7 +72,18 @@ export function ProductForm({
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="price">Precio Actual ($)</Label>
+              <Label htmlFor="duration">Duración</Label>
+              <Input
+                id="duration"
+                value={formData.duration}
+                onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                placeholder="ej: 8 semanas"
+                required
+                disabled={loading}
+              />
+            </div>
+            <div>
+              <Label htmlFor="price">Precio ($)</Label>
               <Input
                 id="price"
                 type="number"
@@ -83,27 +95,21 @@ export function ProductForm({
               />
             </div>
             <div>
-              <Label htmlFor="original_price">Precio Original ($)</Label>
-              <Input
-                id="original_price"
-                type="number"
-                step="0.01"
-                value={formData.original_price}
-                onChange={(e) => setFormData({ ...formData, original_price: e.target.value })}
-                required
+              <Label htmlFor="level">Nivel</Label>
+              <Select
+                value={formData.level}
+                onValueChange={(value) => setFormData({ ...formData, level: value })}
                 disabled={loading}
-              />
-            </div>
-            <div>
-              <Label htmlFor="stock_quantity">Cantidad en Stock</Label>
-              <Input
-                id="stock_quantity"
-                type="number"
-                value={formData.stock_quantity}
-                onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value })}
-                required
-                disabled={loading}
-              />
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar nivel" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Básico">Básico</SelectItem>
+                  <SelectItem value="Intermedio">Intermedio</SelectItem>
+                  <SelectItem value="Avanzado">Avanzado</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -114,7 +120,7 @@ export function ProductForm({
               ) : (
                 <Save className="h-4 w-4 mr-2" />
               )}
-              {editingProduct ? "Actualizar" : "Crear"} Producto
+              {editingCourse ? "Actualizar" : "Crear"} Curso
             </Button>
             <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
               <X className="h-4 w-4 mr-2" />

@@ -1,35 +1,35 @@
 import { useState, useEffect } from "react"
+import { apiService } from "../../lib/api"
 
 export interface Course {
-  id: number
-  name: string
+  _id?: string
+  id?: number
+  title: string
   description: string
-  price: number
   duration: string
+  price: number
+  instructor: string
   level: string
-  modality: string
-  max_students: number
-  is_active: boolean
+  is_available: boolean
+  rating: number
 }
 
 export interface CourseFormData {
-  name: string
+  title: string
   description: string
-  price: string
   duration: string
+  price: string
+  instructor: string
   level: string
-  modality: string
-  max_students: string
 }
 
 const initialFormData: CourseFormData = {
-  name: "",
+  title: "",
   description: "",
-  price: "",
   duration: "",
-  level: "Básico",
-  modality: "Presencial",
-  max_students: "10",
+  price: "",
+  instructor: "",
+  level: "",
 }
 
 export function useCourses() {
@@ -37,118 +37,157 @@ export function useCourses() {
   const [isEditing, setIsEditing] = useState(false)
   const [editingCourse, setEditingCourse] = useState<Course | null>(null)
   const [formData, setFormData] = useState<CourseFormData>(initialFormData)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    loadMockCourses()
+    loadCourses()
   }, [])
 
-  const loadMockCourses = () => {
-    const mockCourses: Course[] = [
-      {
-        id: 1,
-        name: "Robótica Avanzada",
-        description: "Aprende a diseñar, programar y construir robots desde cero. Incluye Arduino, sensores y actuadores.",
-        price: 299,
-        duration: "3 meses",
-        level: "Intermedio",
-        modality: "Presencial/Virtual",
-        max_students: 10,
-        is_active: true,
-      },
-      {
-        id: 2,
-        name: "Electrónica Digital",
-        description: "Domina los fundamentos de la electrónica digital, circuitos integrados y microcontroladores.",
-        price: 249,
-        duration: "2 meses",
-        level: "Básico",
-        modality: "Presencial/Virtual",
-        max_students: 15,
-        is_active: true,
-      },
-      {
-        id: 3,
-        name: "Reparación de Laptops",
-        description: "Técnicas profesionales para diagnóstico y reparación de laptops. Incluye soldadura SMD.",
-        price: 199,
-        duration: "6 semanas",
-        level: "Intermedio",
-        modality: "Presencial",
-        max_students: 8,
-        is_active: true,
-      },
-      {
-        id: 4,
-        name: "Reparación de PCs",
-        description: "Mantenimiento, diagnóstico y reparación de computadoras de escritorio y servidores.",
-        price: 149,
-        duration: "4 semanas",
-        level: "Básico",
-        modality: "Presencial/Virtual",
-        max_students: 12,
-        is_active: true,
-      },
-    ]
-    setCourses(mockCourses)
-  }
-
-  const createCourse = (courseData: Omit<Course, "id" | "is_active">) => {
-    const newCourse: Course = {
-      id: Math.max(...courses.map(c => c.id)) + 1,
-      ...courseData,
-      is_active: true,
+  const loadCourses = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const data = await apiService.getCourses()
+      // Transformar los datos para mantener compatibilidad con el frontend
+      const transformedCourses = data.map((course: any) => ({
+        id: course._id, // Usar _id como id para compatibilidad
+        _id: course._id,
+        title: course.title || 'Curso sin título',
+        description: course.description || 'Sin descripción',
+        duration: course.duration || 'No especificado',
+        price: course.price || 0,
+        instructor: course.instructor || 'Instructor por asignar',
+        level: course.level || 'Básico',
+        is_available: course.is_available || true,
+        rating: course.rating || 0,
+      }))
+      setCourses(transformedCourses)
+    } catch (err) {
+      setError('Error al cargar cursos')
+      console.error('Error loading courses:', err)
+    } finally {
+      setLoading(false)
     }
-    setCourses(prev => [...prev, newCourse])
-    return newCourse
   }
 
-  const updateCourse = (id: number, courseData: Partial<Course>) => {
-    setCourses(prev => 
-      prev.map(course => 
-        course.id === id ? { ...course, ...courseData, id: course.id } : course
+  const createCourse = async (courseData: Omit<Course, "id" | "is_available" | "rating">) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const newCourse = await apiService.createCourse({
+        ...courseData,
+        is_available: true,
+        rating: 0,
+      })
+      
+      // Agregar el nuevo curso a la lista
+      const transformedCourse = {
+        id: newCourse._id,
+        _id: newCourse._id,
+        ...courseData,
+        is_available: true,
+        rating: 0,
+      }
+      setCourses(prev => [...prev, transformedCourse])
+      return transformedCourse
+    } catch (err) {
+      setError('Error al crear curso')
+      console.error('Error creating course:', err)
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const updateCourse = async (id: string, courseData: Partial<Course>) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const updatedCourse = await apiService.updateCourse(id, courseData)
+      
+      // Actualizar el curso en la lista
+      setCourses(prev => 
+        prev.map(course => 
+          course._id === id ? { ...course, ...courseData } : course
+        )
       )
-    )
+      return updatedCourse
+    } catch (err) {
+      setError('Error al actualizar curso')
+      console.error('Error updating course:', err)
+      throw err
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const deleteCourse = (id: number) => {
-    setCourses(prev => prev.filter(course => course.id !== id))
+  const deleteCourse = async (id: string) => {
+    setLoading(true)
+    setError(null)
+    try {
+      await apiService.deleteCourse(id)
+      setCourses(prev => prev.filter(course => course._id !== id))
+    } catch (err) {
+      setError('Error al eliminar curso')
+      console.error('Error deleting course:', err)
+      throw err
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const toggleCourseAvailability = async (id: string) => {
+    const course = courses.find(c => c._id === id)
+    if (!course) return
+
+    try {
+      await updateCourse(id, { is_available: !course.is_available })
+    } catch (err) {
+      console.error('Error toggling course availability:', err)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     const courseData = {
       ...formData,
       price: Number.parseFloat(formData.price),
-      max_students: Number.parseInt(formData.max_students),
     }
 
-    if (editingCourse) {
-      updateCourse(editingCourse.id, courseData)
-    } else {
-      createCourse(courseData)
+    try {
+      if (editingCourse) {
+        await updateCourse(editingCourse._id!, courseData)
+      } else {
+        await createCourse(courseData)
+      }
+      resetForm()
+    } catch (err) {
+      // Error ya manejado en las funciones individuales
     }
-
-    resetForm()
   }
 
   const handleEdit = (course: Course) => {
     setEditingCourse(course)
     setFormData({
-      name: course.name,
+      title: course.title,
       description: course.description,
-      price: course.price.toString(),
       duration: course.duration,
+      price: course.price.toString(),
+      instructor: course.instructor,
       level: course.level,
-      modality: course.modality,
-      max_students: course.max_students.toString(),
     })
     setIsEditing(true)
   }
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: string) => {
     if (confirm("¿Estás seguro de que quieres eliminar este curso?")) {
-      deleteCourse(id)
+      try {
+        await deleteCourse(id)
+      } catch (err) {
+        // Error ya manejado en deleteCourse
+      }
     }
   }
 
@@ -156,12 +195,14 @@ export function useCourses() {
     setFormData(initialFormData)
     setEditingCourse(null)
     setIsEditing(false)
+    setError(null)
   }
 
   const openCreateForm = () => {
     setIsEditing(true)
     setEditingCourse(null)
     setFormData(initialFormData)
+    setError(null)
   }
 
   return {
@@ -170,6 +211,8 @@ export function useCourses() {
     isEditing,
     editingCourse,
     formData,
+    loading,
+    error,
     
     // Actions
     setFormData,
@@ -178,5 +221,7 @@ export function useCourses() {
     handleDelete,
     resetForm,
     openCreateForm,
+    toggleCourseAvailability,
+    loadCourses,
   }
 } 

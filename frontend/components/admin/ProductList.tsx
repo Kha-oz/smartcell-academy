@@ -1,29 +1,48 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Edit, Trash2, Package } from "lucide-react"
+import { Edit, Trash2, Package, Loader2 } from "lucide-react"
 import { Product } from "@/hooks/admin/useProducts"
 import { getStockStatus } from "@/utils/productUtils"
 
 interface ProductListProps {
   products: Product[]
   onEdit: (product: Product) => void
-  onDelete: (id: number) => void
-  onToggleAvailability: (id: number) => void
+  onDelete: (id: string) => void
+  onToggleAvailability: (id: string) => void
+  loading?: boolean
 }
 
 export function ProductList({
   products,
   onEdit,
   onDelete,
-  onToggleAvailability
+  onToggleAvailability,
+  loading = false
 }: ProductListProps) {
+  if (loading && products.length === 0) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+        <span className="ml-2 text-gray-500">Cargando productos...</span>
+      </div>
+    )
+  }
+
+  if (products.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        No hay productos disponibles
+      </div>
+    )
+  }
+
   return (
     <div className="grid gap-4">
       {products.map((product) => {
         const stockStatus = getStockStatus(product.stock_quantity)
         return (
-          <Card key={product.id} className={!product.is_available ? "opacity-60" : ""}>
+          <Card key={product._id} className={!product.is_available ? "opacity-60" : ""}>
             <CardContent className="p-6">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
@@ -46,14 +65,25 @@ export function ProductList({
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    onClick={() => onToggleAvailability(product.id)}
+                    onClick={() => onToggleAvailability(product._id!)}
+                    disabled={loading}
                   >
                     {product.is_available ? "Ocultar" : "Mostrar"}
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => onEdit(product)}>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => onEdit(product)}
+                    disabled={loading}
+                  >
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => onDelete(product.id)}>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => onDelete(product._id!)}
+                    disabled={loading}
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
