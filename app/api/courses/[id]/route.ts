@@ -31,6 +31,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       validatedData.modality,
       id,
     ]);
+    console.log(executeQuery);
     return NextResponse.json({ message: "Curso actualizado correctamente" });
   } catch (error) {
     if (error instanceof z.ZodError) {

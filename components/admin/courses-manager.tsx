@@ -105,6 +105,7 @@ export default function CoursesManager() {
       if (response.ok) {
         loadCourses() // Recargar cursos
         resetForm()
+        handleEdit(courseData as Course) // Actualizar curso editado
         alert(editingCourse ? "Curso actualizado" : "Curso creado exitosamente")
       } else {
         alert("Error al guardar el curso")

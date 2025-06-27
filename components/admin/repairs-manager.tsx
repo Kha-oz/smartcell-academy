@@ -41,79 +41,46 @@ export default function RepairsManager() {
     estimated_cost: "",
   })
 
-  useEffect(() => {
-    loadRepairs()
-  }, [])
-
-  const loadRepairs = () => {
-    // Datos de ejemplo (reemplazar con API real)
-    const mockRepairs: Repair[] = [
-      {
-        id: 1,
-        client_name: "Ana Herrera",
-        client_email: "ana@email.com",
-        client_phone: "+1234567893",
-        device_type: "laptop",
-        device_brand: "HP",
-        device_model: "Pavilion 15",
-        problem_description: "No enciende, posible problema con la fuente de poder",
-        estimated_cost: 85,
-        status: "diagnostico",
-        created_at: "2024-01-15T08:30:00Z",
-      },
-      {
-        id: 2,
-        client_name: "Roberto Silva",
-        client_email: "roberto@email.com",
-        client_phone: "+1234567894",
-        device_type: "celular",
-        device_brand: "Samsung",
-        device_model: "Galaxy S21",
-        problem_description: "Pantalla rota, táctil no responde",
-        estimated_cost: 120,
-        status: "reparando",
-        created_at: "2024-01-14T14:20:00Z",
-      },
-      {
-        id: 3,
-        client_name: "Patricia López",
-        client_email: "patricia@email.com",
-        client_phone: "+1234567895",
-        device_type: "pc",
-        device_brand: "Dell",
-        device_model: "OptiPlex 7090",
-        problem_description: "Lentitud extrema, posible virus",
-        estimated_cost: 45,
-        status: "completado",
-        created_at: "2024-01-13T11:15:00Z",
-      },
-    ]
-    setRepairs(mockRepairs)
+  // Función para cargar reparaciones desde la API
+  async function cargarReparaciones() {
+    try {
+      const response = await fetch("/api/repairs")
+      if (!response.ok) throw new Error("Error al cargar reparaciones")
+      const data = await response.json()
+      setRepairs(data)
+    } catch (err) {
+      alert("Error al cargar reparaciones")
+    }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  // Función para enviar una reparación a la API
+  async function enviarReparacion(data: Omit<Repair, "id" | "status" | "created_at">) {
+    const response = await fetch("/api/repairs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    })
+    if (!response.ok) throw new Error("Error al guardar reparación")
+    return await response.json()
+  }
 
+  useEffect(() => {
+    cargarReparaciones()
+  }, [])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
     const repairData = {
       ...formData,
       estimated_cost: Number.parseFloat(formData.estimated_cost) || 0,
     }
-
-    if (editingRepair) {
-      // Actualizar reparación existente
-      setRepairs(repairs.map((repair) => (repair.id === editingRepair.id ? { ...repair, ...repairData } : repair)))
-    } else {
-      // Crear nueva reparación
-      const newRepair: Repair = {
-        id: Date.now(),
-        ...repairData,
-        status: "recibido",
-        created_at: new Date().toISOString(),
-      }
-      setRepairs([...repairs, newRepair])
+    try {
+      await enviarReparacion(repairData)
+      await cargarReparaciones()
+      resetForm()
+    } catch (err) {
+      alert("Error al guardar reparación")
     }
-
-    resetForm()
   }
 
   const handleEdit = (repair: Repair) => {
