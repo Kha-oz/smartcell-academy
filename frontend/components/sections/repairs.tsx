@@ -7,7 +7,7 @@ import { Smartphone, Laptop, Monitor, Clock, CheckCircle, Star, Loader2, Wrench 
 
 export default function Repairs() {
   const { repairs, loading, error } = useRepairs()
-
+  
   const openWhatsApp = (service: string) => {
     const phoneNumber = "1234567890" // Reemplaza con tu número
     const message = `Hola! Necesito el servicio de ${service}. ¿Podrían ayudarme?`
@@ -15,6 +15,7 @@ export default function Repairs() {
     window.open(url, "_blank")
   }
 
+  
   // Función para obtener el icono según la categoría del servicio
   const getServiceIcon = (category?: string) => {
     if (!category) return <Wrench className="h-8 w-8" /> // Icono por defecto si no hay categoría

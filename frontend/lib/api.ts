@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 class ApiService {
   private baseUrl: string;
@@ -12,10 +12,10 @@ class ApiService {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
-    
+
     const config: RequestInit = {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...options.headers,
       },
       ...options,
@@ -23,167 +23,174 @@ class ApiService {
 
     try {
       const response = await fetch(url, config);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
-      return await response.json();
+
+      const data = await response.json();
+      return data;
     } catch (error) {
-      console.error('API request failed:', error);
       throw error;
     }
   }
 
   // Products API
   async getProducts() {
-    return this.request<any[]>('/api/products');
+    return this.request<any[]>("/api/products");
   }
 
   async createProduct(productData: any) {
-    return this.request<any>('/api/products', {
-      method: 'POST',
+    return this.request<any>("/api/products", {
+      method: "POST",
       body: JSON.stringify(productData),
     });
   }
 
   async updateProduct(id: string, productData: any) {
     return this.request<any>(`/api/products/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(productData),
     });
   }
 
   async deleteProduct(id: string) {
     return this.request<{ message: string }>(`/api/products/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
   // Courses API
   async getCourses() {
-    return this.request<any[]>('/api/courses');
+    return this.request<any[]>("/api/courses");
   }
 
   async createCourse(courseData: any) {
-    return this.request<any>('/api/courses', {
-      method: 'POST',
+    return this.request<any>("/api/courses", {
+      method: "POST",
       body: JSON.stringify(courseData),
     });
   }
 
   async updateCourse(id: string, courseData: any) {
     return this.request<any>(`/api/courses/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(courseData),
     });
   }
 
   async deleteCourse(id: string) {
     return this.request<{ message: string }>(`/api/courses/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
   // Repairs API
   async getRepairs() {
-    return this.request<any[]>('/api/repairs');
+    try {
+      const data = await this.request<any[]>("/api/repairs");
+
+      return data;
+    } catch (error) {
+      console.error("API getRepairs error:", error);
+      throw error;
+    }
   }
 
   async createRepair(repairData: any) {
-    return this.request<any>('/api/repairs', {
-      method: 'POST',
+    return this.request<any>("/api/repairs", {
+      method: "POST",
       body: JSON.stringify(repairData),
     });
   }
 
   async updateRepair(id: string, repairData: any) {
     return this.request<any>(`/api/repairs/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(repairData),
     });
   }
 
   async deleteRepair(id: string) {
     return this.request<{ message: string }>(`/api/repairs/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
   // Testimonials API
   async getTestimonials() {
-    return this.request<any[]>('/api/testimonials');
+    return this.request<any[]>("/api/testimonials");
   }
 
   async createTestimonial(testimonialData: any) {
-    return this.request<any>('/api/testimonials', {
-      method: 'POST',
+    return this.request<any>("/api/testimonials", {
+      method: "POST",
       body: JSON.stringify(testimonialData),
     });
   }
 
   async updateTestimonial(id: string, testimonialData: any) {
     return this.request<any>(`/api/testimonials/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(testimonialData),
     });
   }
 
   async deleteTestimonial(id: string) {
     return this.request<{ message: string }>(`/api/testimonials/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
   // Contacts API
   async getContacts() {
-    return this.request<any[]>('/api/contacts');
+    return this.request<any[]>("/api/contacts");
   }
 
   async createContact(contactData: any) {
-    return this.request<any>('/api/contacts', {
-      method: 'POST',
+    return this.request<any>("/api/contacts", {
+      method: "POST",
       body: JSON.stringify(contactData),
     });
   }
 
   async updateContact(id: string, contactData: any) {
     return this.request<any>(`/api/contacts/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(contactData),
     });
   }
 
   async deleteContact(id: string) {
     return this.request<{ message: string }>(`/api/contacts/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
   // DateUser API
   async getDateUsers() {
-    return this.request<any[]>('/api/date-users');
+    return this.request<any[]>("/api/date-users");
   }
 
   async createDateUser(dateUserData: any) {
-    return this.request<any>('/api/date-users', {
-      method: 'POST',
+    return this.request<any>("/api/date-users", {
+      method: "POST",
       body: JSON.stringify(dateUserData),
     });
   }
 
   async updateDateUser(id: string, dateUserData: any) {
     return this.request<any>(`/api/date-users/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(dateUserData),
     });
   }
 
   async deleteDateUser(id: string) {
     return this.request<{ message: string }>(`/api/date-users/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 }
 
-export const apiService = new ApiService(API_BASE_URL); 
+export const apiService = new ApiService(API_BASE_URL);
