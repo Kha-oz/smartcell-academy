@@ -13,7 +13,11 @@ async function bootstrap() {
   app.useStaticAssets(staticPath);
 
   // Habilitar CORS para el frontend de forma dinámica , despues hacerlo 
-  app.enableCors();
+  app.enableCors({
+    origin: 'https://smartcell-academy.vercel.app',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') || 3000;
