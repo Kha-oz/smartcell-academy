@@ -9,66 +9,40 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Edit, Wrench, Phone, Mail, Calendar, Save, X, RefreshCw, Loader2 } from "lucide-react"
-import { useDateUser } from "@/hooks/admin/useRepairs"
+import { Plus, Edit, Wrench, Save, X, RefreshCw, Loader2, Eye, EyeOff } from "lucide-react"
+import { useRepairs } from "@/hooks/admin/useRepairs"
 
 export default function RepairsManager() {
   const {
-    dateUsers,
+    repairs,
     isEditing,
-    editingDateUser,
+    editingRepair,
     formData,
     loading,
     error,
     setFormData,
     handleSubmit,
     handleEdit,
-    deleteDateUser,
+    handleDelete,
     resetForm,
     openCreateForm,
-    loadDateUsers,
-  } = useDateUser()
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "recibido":
-        return "default"
-      case "diagnostico":
-        return "secondary"
-      case "reparando":
-        return "destructive"
-      case "completado":
-        return "outline"
-      case "entregado":
-        return "default"
-      default:
-        return "default"
-    }
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("es-ES", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-  }
-
-  const openWhatsApp = (phone: string, name: string, deviceType: string) => {
-    const message = `Hola ${name}, te contactamos desde SMARTCELL ACADEMY sobre la reparación de tu ${deviceType}.`
-    const url = `https://wa.me/${phone.replace(/\D/g, "")}?text=${encodeURIComponent(message)}`
-    window.open(url, "_blank")
-  }
+    loadRepairs,
+    toggleRepairAvailability,
+  } = useRepairs()
 
   return (
     <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold text-black">Servicios de Reparación</h2>
+        <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          Servicios profesionales de reparación con garantía y los mejores tiempos de respuesta. Diagnóstico gratuito en todos nuestros servicios.
+        </p>
+      </div>
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-black">Gestión de Reparaciones</h2>
+        <div></div>
         <div className="flex gap-2">
           <Button 
-            onClick={loadDateUsers} 
+            onClick={loadRepairs} 
             variant="outline" 
             disabled={loading}
             className="flex items-center gap-2"
@@ -78,7 +52,7 @@ export default function RepairsManager() {
           </Button>
           <Button onClick={openCreateForm} className="bg-green-500 hover:bg-green-600">
             <Plus className="h-4 w-4 mr-2" />
-            Nueva Reparación
+            Nuevo Servicio
           </Button>
         </div>
       </div>
@@ -93,7 +67,7 @@ export default function RepairsManager() {
       {isEditing && (
         <Card>
           <CardHeader>
-            <CardTitle>{editingDateUser ? "Editar Reparación" : "Nueva Reparación"}</CardTitle>
+            <CardTitle>{editingRepair ? "Editar Servicio" : "Nuevo Servicio de Reparación"}</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -114,6 +88,7 @@ export default function RepairsManager() {
                     id="duration"
                     value={formData.duration}
                     onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                    placeholder="ej: 1-2 horas"
                     required
                     disabled={loading}
                   />
@@ -127,16 +102,19 @@ export default function RepairsManager() {
                     id="category"
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    placeholder="ej: Smartphone, Laptop, PC"
                     required
                     disabled={loading}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="features">Características (separadas por coma)</Label>
+                  <Label htmlFor="price">Precio ($)</Label>
                   <Input
-                    id="features"
-                    value={formData.features}
-                    onChange={(e) => setFormData({ ...formData, features: e.target.value })}
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     required
                     disabled={loading}
                   />
@@ -144,7 +122,7 @@ export default function RepairsManager() {
               </div>
 
               <div>
-                <Label htmlFor="description">Descripción del Problema</Label>
+                <Label htmlFor="description">Descripción del Servicio</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
@@ -156,13 +134,12 @@ export default function RepairsManager() {
               </div>
 
               <div>
-                <Label htmlFor="price">Costo Estimado ($)</Label>
+                <Label htmlFor="features">Características (separadas por coma)</Label>
                 <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  id="features"
+                  value={formData.features}
+                  onChange={(e) => setFormData({ ...formData, features: e.target.value })}
+                  placeholder="ej: Garantía de 3 meses, Diagnóstico gratuito, Piezas originales"
                   required
                   disabled={loading}
                 />
@@ -175,7 +152,7 @@ export default function RepairsManager() {
                   ) : (
                     <Save className="h-4 w-4 mr-2" />
                   )}
-                  {editingDateUser ? "Actualizar" : "Crear"} Reparación
+                  {editingRepair ? "Actualizar" : "Crear"} Servicio
                 </Button>
                 <Button type="button" variant="outline" onClick={resetForm} disabled={loading}>
                   <X className="h-4 w-4 mr-2" />
@@ -187,20 +164,20 @@ export default function RepairsManager() {
         </Card>
       )}
 
-      {/* Lista de Reparaciones */}
+      {/* Lista de Servicios */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-black">Reparaciones Registradas</h3>
-        {loading && dateUsers.length === 0 ? (
+        <h3 className="text-lg font-semibold text-black">Servicios de Reparación Disponibles</h3>
+        {loading && repairs.length === 0 ? (
           <div className="flex justify-center items-center py-8">
             <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-            <span className="ml-2 text-gray-500">Cargando reparaciones...</span>
+            <span className="ml-2 text-gray-500">Cargando servicios...</span>
           </div>
-        ) : dateUsers.length === 0 ? (
+        ) : repairs.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            No hay reparaciones registradas
+            No hay servicios de reparación registrados
           </div>
         ) : (
-          dateUsers.map((repair) => (
+          repairs.map((repair) => (
             <Card key={repair._id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-6">
                 <div className="flex justify-between items-start">
@@ -208,7 +185,9 @@ export default function RepairsManager() {
                     <div className="flex items-center space-x-3 mb-2">
                       <Wrench className="h-5 w-5 text-gray-500" />
                       <h4 className="text-lg font-semibold text-black">{repair.service_name}</h4>
-                      <Badge variant={getStatusColor(repair.service_name) as any}>{repair.service_name}</Badge>
+                      <Badge variant={repair.is_available ? "default" : "secondary"}>
+                        {repair.is_available ? "Disponible" : "No disponible"}
+                      </Badge>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                       <div className="space-y-1">
@@ -219,18 +198,34 @@ export default function RepairsManager() {
                           <strong>Categoría:</strong> {repair.category}
                         </p>
                         <p className="text-sm text-gray-600">
-                          <strong>Características:</strong> {repair.features.join(', ')}
+                          <strong>Precio:</strong> ${repair.price}
                         </p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-sm text-gray-600">
-                          <strong>Costo estimado:</strong> ${repair.price}
+                          <strong>Características:</strong>
                         </p>
+                        <div className="flex flex-wrap gap-1">
+                          {repair.features.map((feature, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs">
+                              {feature}
+                            </Badge>
+                          ))}
+                        </div>
                       </div>
                     </div>
                     <p className="text-gray-600 text-sm">{repair.description}</p>
                   </div>
                   <div className="flex space-x-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => toggleRepairAvailability(repair._id!)}
+                      disabled={loading}
+                      title={repair.is_available ? "Ocultar servicio" : "Mostrar servicio"}
+                    >
+                      {repair.is_available ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
                     <Button 
                       variant="outline" 
                       size="sm" 
@@ -242,7 +237,7 @@ export default function RepairsManager() {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      onClick={() => deleteDateUser(repair._id!)}
+                      onClick={() => handleDelete(repair._id!)}
                       disabled={loading}
                     >
                       <X className="h-4 w-4" />

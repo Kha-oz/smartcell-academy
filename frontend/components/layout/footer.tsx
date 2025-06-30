@@ -123,8 +123,7 @@ export default function Footer({ setActiveSection }: FooterProps) {
               <div className="flex items-center space-x-3">
                 <Phone className="h-5 w-5 text-green-500" />
                 <div className="text-gray-300">
-                  <p>+1 (555) 123-4567</p>
-                  <p>+1 (555) 987-6543</p>
+                  <p>+51 950 262 596</p>
                 </div>
               </div>
 

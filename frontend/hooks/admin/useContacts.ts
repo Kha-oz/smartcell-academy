@@ -221,5 +221,6 @@ export function useContacts() {
     markAsRead,
     updateContactStatus,
     loadContacts,
+    createContact,
   }
 } 

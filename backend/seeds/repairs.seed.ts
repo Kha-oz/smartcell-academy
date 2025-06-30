@@ -1,37 +1,47 @@
 export const repairs = [
   {
-    title: "Cambio de pantalla",
+    service_name: "Cambio de pantalla",
     description: "Reemplazo de pantallas dañadas para smartphones y tablets.",
-    time: "1-2 horas",
+    duration: "1-2 horas",
     features: ["Garantía de 3 meses", "Pantalla original", "Servicio técnico especializado"],
-    price: "120"
+    price: 120,
+    category: "Smartphone",
+    is_available: true
   },
   {
-    title: "Reparación de placa base",
+    service_name: "Reparación de placa base",
     description: "Diagnóstico y reparación de fallas en placas base de dispositivos móviles.",
-    time: "2-4 horas",
+    duration: "2-4 horas",
     features: ["Diagnóstico gratuito", "Reparación con garantía", "Piezas de calidad"],
-    price: "200"
+    price: 200,
+    category: "Smartphone",
+    is_available: true
   },
   {
-    title: "Sustitución de batería",
+    service_name: "Sustitución de batería",
     description: "Cambio de baterías para una amplia gama de dispositivos electrónicos.",
-    time: "30-60 minutos",
+    duration: "30-60 minutos",
     features: ["Batería de alta duración", "Instalación profesional", "Garantía de 6 meses"],
-    price: "60"
+    price: 60,
+    category: "Smartphone",
+    is_available: true
   },
   {
-    title: "Recuperación de datos",
+    service_name: "Recuperación de datos",
     description: "Recuperación de información de dispositivos dañados o formateados.",
-    time: "Variable",
+    duration: "Variable",
     features: ["Recuperación segura", "Confidencialidad garantizada", "Reporte detallado"],
-    price: "150"
+    price: 150,
+    category: "General",
+    is_available: true
   },
   {
-    title: "Limpieza interna y mantenimiento",
+    service_name: "Limpieza interna y mantenimiento",
     description: "Servicio de limpieza y mantenimiento preventivo para laptops y PCs.",
-    time: "1-2 horas",
+    duration: "1-2 horas",
     features: ["Limpieza profunda", "Optimización del sistema", "Mantenimiento preventivo"],
-    price: "80"
+    price: 80,
+    category: "Laptop",
+    is_available: true
   },
 ]; 

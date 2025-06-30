@@ -11,7 +11,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { MapPin, Phone, Mail, Clock, MessageCircle, Loader2, CheckCircle } from "lucide-react"
 
 export default function Contact() {
-  const { createContact, loading, error } = useContacts()
+  const contactsHook = useContacts()
+  const { loading, error } = contactsHook
+  const createContact = contactsHook.createContact
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -23,9 +25,12 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+    if (!createContact) {
+      alert('No se puede enviar el mensaje en este momento. Intenta más tarde.')
+      return
+    }
     try {
-      await createContact(formData)
+      await createContact({ ...formData, status: 'pending' })
       setIsSubmitted(true)
       setFormData({
         name: "",
@@ -91,8 +96,7 @@ export default function Contact() {
                 <CardContent className="p-6 text-center">
                   <Phone className="h-8 w-8 text-green-500 mx-auto mb-4" />
                   <h3 className="font-semibold text-black mb-2">Teléfono</h3>
-                  <p className="text-gray-600">+1 (555) 123-4567</p>
-                  <p className="text-gray-600">+1 (555) 987-6543</p>
+                  <p className="text-gray-600">+51 950 262 596</p>
                 </CardContent>
               </Card>
 
